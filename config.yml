@@ -1,0 +1,27 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+  execreceiver:
+    interval: 1m
+    script: /opt/axess/executables/axess_executables/collectd/prometheus_mock_json.py
+
+processors:
+  batch:
+
+exporters:
+  debug:
+    verbosity: detailed
+  prometheusremotewrite:
+      endpoint: http://127.0.0.1:8428/api/v1/write
+
+service:
+  pipelines:
+    metrics:
+      receivers: [execreceiver]
+      processors: [batch]
+      exporters: [prometheusremotewrite]
+  telemetry:
+    logs:
+      level: debug
